@@ -155,9 +155,15 @@ _uWaitTest: uWaitTest.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o _uWaitTest uWaitTest.o ulib.o usys.o printf.o
 	$(OBJDUMP) -S _uWaitTest > uWaitTest.asm
 
+_lab1_test: lab1_test.o $(ULIB)
+	# forktest has less library code linked in - needs to be small
+	# in order to be able to max out the proc table.
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o _lab1_test lab1_test.o ulib.o usys.o printf.o
+	$(OBJDUMP) -S _lab1_test > lab1_test.asm
+
 mkfs: mkfs.c fs.h
 	gcc -Werror -Wall -o mkfs mkfs.c
-
+	      
 # Prevent deletion of intermediate files, e.g. cat.o, after first build, so
 # that disk image changes after first build are persistent until clean.  More
 # details:
@@ -169,6 +175,7 @@ UPROGS=\
 	_echo\
 	_forktest\
 	_uWaitTest\
+	_lab1_test\
 	_grep\
 	_init\
 	_kill\
@@ -249,7 +256,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c uWaitTest.c forktest.c grep.c kill.c\
-	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
+	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c lab1_test.c\
 	printf.c umalloc.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
