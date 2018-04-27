@@ -325,6 +325,9 @@ waitpid(int pid, int *status, int options){
   int pid_zombie;
   struct proc *curproc = myproc();
   
+  if(pid == curproc->pid)
+	exit(-1);  
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited processes.
