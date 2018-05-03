@@ -328,6 +328,8 @@ waitpid(int pid, int *status, int options){
   if(pid == curproc->pid)
       exit(-1);
  
+  
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for exited processes.
