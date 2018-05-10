@@ -443,7 +443,7 @@ scheduler2(void)
         continue;
       sP = ptable.proc;                                //ADDED lab-2
 
-      for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){
+      for(p_ = ptable.proc; p < &ptable.proc[NPROC]; p_++){
         if(p_->state != RUNNABLE)
           continue;
         if(p_->priorityVal < sP->priorityVal) 
