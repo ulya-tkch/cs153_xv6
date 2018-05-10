@@ -26,6 +26,17 @@ sys_exit(void)
   return 0;  // not reached
 }
 
+int                      //ADDED LAB-2
+sys_setpriority(void)
+{
+  int priority;
+  if(argint(0, &priority) < 0)
+     return -1;
+  setpriority(priority);
+
+  return 0;
+}
+                         //END ADDED LAB-2
 int
 sys_wait(void)
 {
@@ -68,6 +79,13 @@ sys_getpid(void)
   return myproc()->pid;
 }
 
+
+int                                //ADDED-lab2
+sys_getpriority(void)
+{
+  return myproc()->priorityVal;
+}
+                                  //END ADDED-lab2
 int
 sys_sbrk(void)
 {

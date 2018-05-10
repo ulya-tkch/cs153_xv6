@@ -119,6 +119,8 @@ void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(int *status);
 int             waitpid(int pid, int *status, int options); //ADDED
+int             getpriority(void);         //ADDEDlab2
+int             setpriority(int priority);            //ADDED lab2
 void            wakeup(void*);
 void            yield(void);
 

@@ -215,7 +215,7 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
-
+  np->priorityVal = 10;  //ADDED LAB-2 (base priority)
   release(&ptable.lock);
 
   return pid;
@@ -229,7 +229,7 @@ exit(int status) //changed from exit()
 {
   struct proc *curproc = myproc();
   curproc->exitStatus = status; //ADDED
-  struct proc *p;
+  struct proc *p; 	
   int fd;
 
   if(curproc == initproc)
@@ -358,6 +358,24 @@ waitpid(int pid, int *status, int options){
   }	
 }
 
+int                             //ADDED-lab2
+getpriority(void) 
+{
+  struct proc *curproc = myproc();
+  if(!curproc)
+	return -1;
+  return curproc->priorityVal; 
+}
+
+int
+setpriority(int priority) 
+{
+  struct proc *curproc = myproc();
+  if(!curproc)
+	return -1;
+  curproc->priorityVal = priority; 
+  return 0;
+}                               //END ADDED-lab2
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -366,14 +384,14 @@ waitpid(int pid, int *status, int options){
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
 void
 scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  int sPriorityLoc = 0; 
   c->proc = 0;
- 
+  
   for(;;){
     // Enable interrupts on this processor.
     sti();
@@ -383,8 +401,6 @@ scheduler(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-      if(p->priorityVal < ptable.proc[sPriorityLoc]->priorityVal) //ADDED
-	sPriorityLoc = p;					 //ADDED
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
@@ -394,6 +410,54 @@ scheduler(void)
       p->state = RUNNING;
 
       swtch(&(c->scheduler), p->context);
+      switchkvm();
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+    }
+    release(&ptable.lock);
+
+  }
+}
+
+
+void
+scheduler2(void)
+{
+  struct proc *p;
+  struct proc *p_;
+  struct cpu *c = mycpu();
+  struct proc *sP; 					 //ADDED LAB2
+  c->proc = 0;
+ 
+  for(;;){
+    // Enable interrupts on this processor.
+    sti();
+
+    // Loop over process table looking for process to run.
+    acquire(&ptable.lock);
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
+        continue;
+      sP = ptable.proc;                                //ADDED lab-2
+
+      for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){
+        if(p_->state != RUNNABLE)
+          continue;
+        if(p_->priorityVal < sP->priorityVal) 
+          sP = p_;
+      }
+                                                               //END ADDED lab-2
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      c->proc = sP;
+      switchuvm(sP);
+      sP->state = RUNNING;
+
+      swtch(&(c->scheduler), sP->context);
       switchkvm();
 
       // Process is done running for now.
