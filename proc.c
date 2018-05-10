@@ -386,7 +386,7 @@ setpriority(int priority)
 //      via swtch back to the scheduler.
 
 void
-scheduler(void)
+scheduler2(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
@@ -423,7 +423,7 @@ scheduler(void)
 
 
 void
-scheduler2(void)
+scheduler(void)
 {
   struct proc *p;
   struct proc *p_;
@@ -441,7 +441,7 @@ scheduler2(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-      sP = ptable.proc;                                //ADDED lab-2
+      sP = p;                                //ADDED lab-2
 
       for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){
         if(p_->state != RUNNABLE)
