@@ -17,6 +17,7 @@ static struct proc *initproc;
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
+extern int sys_uptime();
 
 static void wakeup1(void *chan);
 
@@ -211,10 +212,13 @@ fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
-
+ 
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
+  np->arrivalTime = sys_uptime();  //ADDED LAB-2
+  np->startTime = 0;                  //
+  np->ageCount = 0;            //ADDED LAB-2
   np->priorityVal = 10;  //ADDED LAB-2 (base priority)
   release(&ptable.lock);
 
@@ -231,6 +235,16 @@ exit(int status) //changed from exit()
   curproc->exitStatus = status; //ADDED
   struct proc *p; 	
   int fd;
+
+  int endtime = sys_uptime();
+
+ cprintf("\nArrival Time of process %d is: %d", curproc->pid, curproc->arrivalTime);                             //ADDED LAB2
+ cprintf("\nStart Time of process %d is: %d", curproc->pid, curproc->startTime);                                             //
+ cprintf("\nFinish Time of process %d is: %d", curproc->pid, endtime);                                                        //
+ cprintf("\nTurnaround Time of process(finish-arrival) %d is: %d", curproc->pid, endtime - curproc->arrivalTime);              //
+ cprintf("\nResponce Time of process(start-arrival) %d is: %d \n", curproc->pid, curproc->startTime - curproc->arrivalTime);       //
+  
+  
 
   if(curproc == initproc)
     panic("init exiting");
@@ -468,6 +482,8 @@ scheduler(void)
       c->proc = sP;
       switchuvm(sP);
       sP->state = RUNNING;
+      if(!sP->startTime)                                            //ADDED lab2, bonus 3
+        sP->startTime = sys_uptime();
       if(sP->ageCount % 5 == 0){                                   //ADDED lab2, Aging Priority
         sP->priorityVal = (sP->priorityVal + 1) % 32;
       }
