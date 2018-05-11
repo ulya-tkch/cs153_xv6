@@ -452,8 +452,14 @@ scheduler(void)
       for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){       
         if(p_->state != RUNNABLE)
           continue;
-        if(p_->priorityVal < sP->priorityVal) 
+        if(p_->priorityVal < sP->priorityVal){ 
           sP = p_;
+          if(sP->ageCount % 5 == 0){
+             if(sP->priorityVal > 0)                                   //ADDED lab2, Aging Priority
+                sP->priorityVal--;
+          }
+          sP->ageCount++;                                              //ENDED ADDED lab2
+        } 
       }
                                                                //END ADDED lab-2
       // Switch to chosen process.  It is the process's job
@@ -462,10 +468,10 @@ scheduler(void)
       c->proc = sP;
       switchuvm(sP);
       sP->state = RUNNING;
-  //    if(sP->ageCount % 5 == 0){                                   //ADDED lab2, Aging Priority
-  //      sP->setpriority(sP->getpriority() + 1);
-  //    }
-  //    sP->ageCount++;                                              //ENDED ADDED lab2
+      if(sP->ageCount % 5 == 0){                                   //ADDED lab2, Aging Priority
+        sP->priorityVal = (sP->priorityVal + 1) % 32;
+      }
+      sP->ageCount++;                                              //ENDED ADDED lab2
       swtch(&(c->scheduler), sP->context);
       switchkvm();
 
