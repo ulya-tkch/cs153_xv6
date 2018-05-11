@@ -373,6 +373,10 @@ setpriority(int priority)
   struct proc *curproc = myproc();
   if(!curproc)
 	return -1;
+  if(priority > 31)
+     priority = 31;
+  else if(priority < 0)
+     priority = 0; 	
   curproc->priorityVal = priority; 
   return 0;
 }                               //END ADDED-lab2
@@ -443,7 +447,9 @@ scheduler(void)
         continue;
       sP = p;                                //ADDED lab-2
 
-      for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){
+      //for loop which searches for the process with the smallest
+      //(highest) priority within the process table that is runnable 
+      for(p_ = ptable.proc; p_ < &ptable.proc[NPROC]; p_++){       
         if(p_->state != RUNNABLE)
           continue;
         if(p_->priorityVal < sP->priorityVal) 
@@ -456,7 +462,10 @@ scheduler(void)
       c->proc = sP;
       switchuvm(sP);
       sP->state = RUNNING;
-
+  //    if(sP->ageCount % 5 == 0){                                   //ADDED lab2, Aging Priority
+  //      sP->setpriority(sP->getpriority() + 1);
+  //    }
+  //    sP->ageCount++;                                              //ENDED ADDED lab2
       swtch(&(c->scheduler), sP->context);
       switchkvm();
 

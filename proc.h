@@ -52,6 +52,7 @@ struct proc {
   int exitStatus;		       // ADDED FOR EXIT STATUS (0-> CLEAN EXIT, 1-> ERROR EXIT);
  // int *waitStatus;		//ADDED FOR WAIT STATUS
   int priorityVal;             //ADDED LAB_2
+  int ageCount;
 };
 
 // Process memory is laid out contiguously, low addresses first:
