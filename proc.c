@@ -243,7 +243,7 @@ exit(int status) //changed from exit()
  cprintf("\nFinish Time of process %d is: %d", curproc->pid, endtime);                                                        //
  cprintf("\nTurnaround Time of process(finish-arrival) %d is: %d", curproc->pid, endtime - curproc->arrivalTime);              //
  cprintf("\nResponse Time of process(start-arrival) %d is: %d \n", curproc->pid, curproc->startTime - curproc->arrivalTime);       //
-  
+ cprintf("\nWait time of process %d is: %d \n", curproc->pid, curproc->wait); 
   
 
   if(curproc == initproc)
