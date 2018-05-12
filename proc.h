@@ -55,6 +55,8 @@ struct proc {
   int ageCount;                //ADDED lab-2
   int arrivalTime;                         //
   int startTime;               //same as first run time  
+  int wait;
+  int startWait;
 };
 
 // Process memory is laid out contiguously, low addresses first:

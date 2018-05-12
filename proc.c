@@ -487,9 +487,20 @@ scheduler(void)
       if(sP->ageCount % 5 == 0){                                   //ADDED lab2, Aging Priority
         sP->priorityVal = (sP->priorityVal + 1) % 32;
       }
+      
+      if(sP->startWait){
+        int t = sys_uptime();
+        sP->wait = sP->wait + (t - sP->startWait);
+      }
+      else
+        sP->wait = 0;
+
       sP->ageCount++;                                              //ENDED ADDED lab2
       swtch(&(c->scheduler), sP->context);
       switchkvm();
+
+      //Add wait time here
+      sP->startWait = sys_uptime();
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
